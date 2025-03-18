@@ -588,14 +588,14 @@ void test_annulus_swap(Library *lib) {
 
   auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
-  build_cubic_wireframe_2d(&mesh, &wireframe_mesh, 4);
+  build_cubic_wireframe_2d(&mesh, &wireframe_mesh, 20);
   std::string vtuPath =
-    "/lore/joshia5/Meshes/curved/annulus-8_wire.vtu";
+    "/lore/joshia5/Meshes/curved/annulus-8-modif_wire.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
   auto cubic_curveVtk_mesh = Mesh(lib);
   cubic_curveVtk_mesh.set_comm(comm);
-  build_cubic_curveVtk_2d(&mesh, &cubic_curveVtk_mesh, 4);
-  vtuPath = "/lore/joshia5/Meshes/curved/annulus-8.vtu";
+  build_cubic_curveVtk_2d(&mesh, &cubic_curveVtk_mesh, 20);
+  vtuPath = "/lore/joshia5/Meshes/curved/annulus-8-modif.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
   vtk::FullWriter writer;
   writer = vtk::FullWriter(
