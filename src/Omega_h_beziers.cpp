@@ -238,6 +238,60 @@ void elevate_curve_order_2to3(Mesh* mesh) {
         new_pts[i*n_new_pts*dim + dim + d] = c2[d];
       }
     }
+
+    // adding for a specific test case, rm after
+    if (i == 12) {
+      printf("edge %d ctrl pts ",i);
+      for (LO d = 0; d < dim; ++d) {
+        printf ("%f ", new_pts[i*n_new_pts*dim + d]);
+      }
+      printf("\n");
+      for (LO d = 0; d < dim; ++d) {
+        printf ("%f ", new_pts[i*n_new_pts*dim + dim + d]);
+      }
+      printf("\n");
+      new_pts[i*n_new_pts*dim + dim-2] =-0.08;
+      new_pts[i*n_new_pts*dim + dim-1] = 0.025;
+    }
+    if (i == 6) {
+      printf("edge %d ctrl pts ",i);
+      for (LO d = 0; d < dim; ++d) {
+        printf ("%f ", new_pts[i*n_new_pts*dim + d]);
+      }
+      printf("\n");
+      for (LO d = 0; d < dim; ++d) {
+        printf ("%f ", new_pts[i*n_new_pts*dim + dim + d]);
+      }
+      printf("\n");
+      new_pts[i*n_new_pts*dim + dim + dim-2] =-0.025;
+      new_pts[i*n_new_pts*dim + dim + dim-1] = 0.065;
+    }
+    if (i == 7) {
+      printf("edge %d ctrl pts ",i);
+      for (LO d = 0; d < dim; ++d) {
+        printf ("%f ", new_pts[i*n_new_pts*dim + d]);
+      }
+      printf("\n");
+      for (LO d = 0; d < dim; ++d) {
+        printf ("%f ", new_pts[i*n_new_pts*dim + dim + d]);
+      }
+      printf("\n");
+      new_pts[i*n_new_pts*dim + dim + dim-2] = 0.06;
+      new_pts[i*n_new_pts*dim + dim + dim-1] = 0.025;
+    }
+    if (i == 11) {
+      printf("edge %d ctrl pts ",i);
+      for (LO d = 0; d < dim; ++d) {
+        printf ("%f ", new_pts[i*n_new_pts*dim + d]);
+      }
+      printf("\n");
+      for (LO d = 0; d < dim; ++d) {
+        printf ("%f ", new_pts[i*n_new_pts*dim + dim + d]);
+      }
+      printf("\n");
+      new_pts[i*n_new_pts*dim + dim + dim-2] = 0.075;
+      new_pts[i*n_new_pts*dim + dim + dim-1] = 0.025;
+    }
   };
   parallel_for(nedge, calc_edge_pts);
   mesh->set_tag_for_ctrlPts(1, Reals(new_pts));
