@@ -24,7 +24,7 @@ static void set_target_metric(Mesh* mesh) {
   auto f = OMEGA_H_LAMBDA(LO v) {
     auto z = coords[v * dim + (dim - 1)];
     auto h = Vector<dim>();
-    h[0] = 0.5; h[1] = 0.5; h[2] = 0.01;
+    h[0] = 0.1; h[1] = 0.1; h[2] = 0.01;
     //for (Int i = 0; i < dim - 1; ++i) h[i] = 0.1;
     h[dim - 1] = 0.001 + 0.198 * std::abs(z - 0.5);
     auto m = diagonal(metric_eigenvalues_from_lengths(h));
@@ -59,13 +59,13 @@ void run_case(Mesh* mesh, char const* vtk_path) {
   opts.should_swap = 0;
   opts.should_coarsen_slivers = 0;
   opts.check_crv_qual = 0;
-  opts.min_quality_allowed = 0.001;
+  opts.min_quality_allowed = 0.000001;
   opts.min_quality_desired = 0.1;
   Now t0 = now();
   auto desired_group_nelems = 2000;
   while (approach_metric(mesh, opts)) {
     auto nelems = mesh->nglobal_ents(mesh->dim());
-    if (nelems < 3000) adapt(mesh, opts);
+    if (nelems < 8000) adapt(mesh, opts);
     else break;
     if (mesh->has_tag(VERT, "target_metric")) set_target_metric<dim>(mesh);
     /*
@@ -73,17 +73,17 @@ void run_case(Mesh* mesh, char const* vtk_path) {
     wireframe_mesh.set_comm(comm);
     build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 10);
     std::string vtuPath = 
-      "/lore/joshia5/Meshes/curved/Kova-123tetwire_ansiorefin.vtu";
+      "/lore/joshia5/Meshes/curved/Kova-123tetwire_ansiov2.vtu";
     vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
 
     auto curveVtk_mesh = Mesh(comm->library());
     curveVtk_mesh.set_comm(comm);
     build_cubic_curveVtk_3d(&mesh, &curveVtk_mesh, 10);
     vtuPath = 
-      "/lore/joshia5/Meshes/curved/Kova-123tetcurveVtk_anisorefin.vtu";
+      "/lore/joshia5/Meshes/curved/Kova-123tetcurveVtk_anisov2.vtu";
     vtk::write_simplex_connectivity(vtuPath.c_str(), &curveVtk_mesh, 2);
-    */
     //if (vtk_path) writer.write();
+    */
   }
   Now t1 = now();
   std::cout << "total time: " << (t1 - t0) << " seconds\n";
@@ -102,7 +102,7 @@ void test_sim_kova_quadratic(Library *lib) {
       mesh.add_tag(i, "global", 1, Omega_h::GOs(mesh.nents(i), 0, 1));
     }
   }
-  if (mesh.dim() == 3) run_case<3>(&mesh, NULL);
+  run_case<3>(&mesh, NULL);
 
 /*
   AdaptOpts opts(&mesh);
@@ -135,14 +135,14 @@ void test_sim_kova_quadratic(Library *lib) {
   wireframe_mesh.set_comm(comm);
   build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 10);
   std::string vtuPath = 
-    "/lore/joshia5/Meshes/curved/Kova-123tetwire_ansiorefin.vtu";
+    "/lore/joshia5/Meshes/curved/Kova-123tetwire_ansiov2.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
 
   auto curveVtk_mesh = Mesh(comm->library());
   curveVtk_mesh.set_comm(comm);
   build_cubic_curveVtk_3d(&mesh, &curveVtk_mesh, 10);
   vtuPath = 
-    "/lore/joshia5/Meshes/curved/Kova-123tetcurveVtk_anisorefin.vtu";
+    "/lore/joshia5/Meshes/curved/Kova-123tetcurveVtk_anisov2.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &curveVtk_mesh, 2);
   return;
 }
