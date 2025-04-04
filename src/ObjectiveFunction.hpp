@@ -27,7 +27,7 @@ class ObjectiveFunction
       //points is provided to the detJ calc function
 
       grad[1] = 20;
-      grad[0]     = -2.0;
+      grad[0] = -2;
 
       return askWorstQuality_2d(mesh, LOs(mesh->nelems(),0,1), 2);
 
