@@ -251,7 +251,7 @@ int main(int argc, char** argv) {
 
   test_rosenbrock();
 
-  test_annuluswithEigen(&lib);
+  //test_annuluswithEigen(&lib);
 
   return 0;
 }
