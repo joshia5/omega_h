@@ -320,6 +320,75 @@ void elevate_curve_order_2to3(Mesh* mesh) {
   return;
 }
 
+void var_order_2to1(Mesh* mesh) {
+  I8 new_order = 2;
+  auto old_ctrl_pts = mesh->get_ctrlPts(1);
+  auto old_n_ctrl_pts = mesh->n_internal_ctrlPts(1);
+  auto coords = mesh->coords();
+  auto nedge = mesh->nedges();
+  auto dim = mesh->dim();
+  auto ev2v = mesh->get_adj(1, 0).ab2b;
+  auto fe2e = mesh->get_adj(2, 1).ab2b;
+
+  mesh->change_max_order(new_order);
+
+  auto n_new_pts = mesh->n_internal_ctrlPts(1);
+  Write<Real> new_pts(nedge*n_new_pts*dim, 0.0);
+  auto calc_edge_order = OMEGA_H_LAMBDA (LO i) {
+    auto v0 = ev2v[i*2];
+    auto v1 = ev2v[i*2 + 1];
+    if (dim == 3) {
+      Omega_h_fail("working on dim 2\n");
+      Vector<3> c1;
+      Vector<3> c2;
+      for (LO d = 0; d < dim; ++d) {
+        c1[d] = (1.0/3.0)*coords[v0*dim + d] +
+          (2.0/3.0)*old_ctrl_pts[i*old_n_ctrl_pts*dim + d];
+        c2[d] = (2.0/3.0)*old_ctrl_pts[i*old_n_ctrl_pts*dim + d] +
+          (1.0/3.0)*coords[v1*dim + d];
+        new_pts[i*n_new_pts*dim + d] = c1[d];
+        new_pts[i*n_new_pts*dim + dim + d] = c2[d];
+      }
+    }
+    else {
+      OMEGA_H_CHECK (dim == 2);
+      Vector<2> c1;
+      Vector<2> c2;
+      for (LO d = 0; d < dim; ++d) {
+        c1[d] = (1.0/3.0)*coords[v0*dim + d] +
+          (2.0/3.0)*old_ctrl_pts[i*old_n_ctrl_pts*dim + d];
+        c2[d] = (2.0/3.0)*old_ctrl_pts[i*old_n_ctrl_pts*dim + d] +
+          (1.0/3.0)*coords[v1*dim + d];
+        new_pts[i*n_new_pts*dim + d] = c1[d];
+        new_pts[i*n_new_pts*dim + dim + d] = c2[d];
+      }
+    }
+  };
+  parallel_for(nedge, calc_edge_pts);
+  mesh->set_tag_for_ctrlPts(1, Reals(new_pts));
+
+  auto nface = mesh->nfaces();
+  n_new_pts = mesh->n_internal_ctrlPts(2);
+  Write<Real> face_pts(nface*n_new_pts*dim, 0.0);
+  if (!mesh->has_tag(2, "interp_pts")) {
+    auto calc_face_pts = OMEGA_H_LAMBDA (LO i) {
+      auto e0 = fe2e[i*3];
+      auto e1 = fe2e[i*3 + 1];
+      auto e2 = fe2e[i*3 + 2];
+      for (LO d = 0; d < dim; ++d) {
+        face_pts[i*n_new_pts*dim + d] =
+          (1.0/3.0)*old_ctrl_pts[e0*old_n_ctrl_pts*dim + d] +
+          (1.0/3.0)*old_ctrl_pts[e1*old_n_ctrl_pts*dim + d] +
+          (1.0/3.0)*old_ctrl_pts[e2*old_n_ctrl_pts*dim + d];
+      }
+    };
+    parallel_for(nface, calc_face_pts);
+  }
+  mesh->set_tag_for_ctrlPts(2, Reals(face_pts));
+
+  return;
+}
+
 void elevate_curve_order_3to4(Mesh* mesh) {
   I8 new_order = 4;
   auto old_edge_ctrl_pts = mesh->get_ctrlPts(1);
