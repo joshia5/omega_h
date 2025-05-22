@@ -399,6 +399,8 @@ void elevate_curve_order_3to4(Mesh* mesh);
 void elevate_curve_order_4to5(Mesh* mesh);
 void elevate_curve_order_5to6(Mesh* mesh);
 
+void var_order_2to1(Mesh* mesh);
+
 void calc_quad_ctrlPts_from_interpPts(Mesh *mesh);
 
 OMEGA_H_INLINE Few<Real,2> quadr_noKeyEdge_xi_values(
