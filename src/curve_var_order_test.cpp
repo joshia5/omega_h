@@ -27,6 +27,10 @@ void test_annulus(Library *lib) {
   LO nedges_rc = rc.ab2b.size();
   printf("num. mesh elms %d\n", nedges_rc);
 
+  vtk::FullWriter writer;
+  writer = vtk::FullWriter("/lore/joshia5/Meshes/curved/annulus-3k", &mesh);
+  writer.write();
+
   return;
 }
 
