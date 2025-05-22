@@ -34,10 +34,35 @@ void test_annulus(Library *lib) {
   return;
 }
 
+void test_annulus3d(Library *lib) {
+
+  auto comm = lib->world();
+
+  auto mesh = meshsim::read("/lore/joshia5/Meshes/curved/annulus3d-24.sms",
+                            "/lore/joshia5/Models/curved/annulus3d.smd", comm);
+ 
+  var_order_2to1(&mesh);
+  //calc_quad_ctrlPts_from_interpPts(&mesh);
+  //elevate_curve_order_2to3(&mesh);
+  mesh.add_tag<Real>(0, "bezier_pts", mesh.dim(), mesh.coords());
+
+  auto rc = mesh.ask_revClass(1);
+  LO nedges_rc = rc.ab2b.size();
+  printf("num. mesh elms %d\n", nedges_rc);
+
+  vtk::FullWriter writer;
+  writer = vtk::FullWriter("/lore/joshia5/Meshes/curved/annulus-3d", &mesh);
+  writer.write();
+
+  return;
+}
+
 int main(int argc, char** argv) {
   auto lib = Library(&argc, &argv);
 
   test_annulus(&lib);
+
+  test_annulus3d(&lib);
 
   return 0;
 }
