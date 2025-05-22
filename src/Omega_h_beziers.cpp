@@ -335,6 +335,8 @@ void var_order_2to1(Mesh* mesh) {
   auto n_new_pts = mesh->n_internal_ctrlPts(1);
   //Write<Real> new_pts(nedge*n_new_pts*dim, 0.0);
 
+  Write<LO> n_quadratic_edges(1, 0);
+  Write<LO> edge_order(nedge, 1);
   auto calc_edge_order = OMEGA_H_LAMBDA (LO i) {
     auto v0 = ev2v[i*2];
     auto v1 = ev2v[i*2 + 1];
@@ -355,22 +357,35 @@ void var_order_2to1(Mesh* mesh) {
     }
     else {
       OMEGA_H_CHECK (dim == 2);
-      Vector<2> c0;
-      Vector<2> c2;
+      Vector<2> p0;
+      Vector<2> p2;
       Vector<2> p1;
       Real m, c;
       for (LO d = 0; d < dim; ++d) {
-        c0[d] = coords[v0*dim + d];
-        c2[d] = coords[v1*dim + d];
+        p0[d] = coords[v0*dim + d];
+        p2[d] = coords[v1*dim + d];
         p1[d] = old_ctrl_pts[i*old_n_ctrl_pts*dim + d];
       }
-      m = (c2[1]-c0[1])/(c2[0]-c0[0]);
-      c = c2[1] - (m*c2[0]);
-      //printf("verif pt %1.15f eps %1.15f \n", (c0[1] - m*c0[0] - c) , EPSILON);
-      OMEGA_H_CHECK((c0[1] - m*c0[0] - c) < EPSILON);
+      m = (p2[1]-p0[1])/(p2[0]-p0[0]);
+      c = p2[1] - (m*p2[0]);
+      //printf("verif pt %1.15f eps %1.15f \n", (p0[1] - m*p0[0] - c) , EPSILON);
+      OMEGA_H_CHECK((p0[1] - m*p0[0] - c) < EPSILON);
+
+      if ((p1[1] - m*p1[0] - c) < EPSILON) {
+        //printf("straight edge\n");
+        edge_order[i] = 1;
+      }
+      else {
+        //printf("quadratic edge\n");
+        edge_order[i] = 2;
+        atomic_increment(&n_quadratic_edges[0]);
+      }
     }
   };
   parallel_for(nedge, calc_edge_order);
+  printf("quadratic edges %d out of total %d\n",
+      n_quadratic_edges[0], nedge);
+  mesh->add_tag(1, "edge_order", 1, LOs(edge_order));
   //mesh->set_tag_for_ctrlPts(1, Reals(new_pts));
 
   /*
