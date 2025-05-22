@@ -388,26 +388,36 @@ void var_order_2to1(Mesh* mesh) {
   mesh->add_tag(1, "edge_order", 1, LOs(edge_order));
   //mesh->set_tag_for_ctrlPts(1, Reals(new_pts));
 
-  /*
   auto nface = mesh->nfaces();
-  n_new_pts = mesh->n_internal_ctrlPts(2);
-  Write<Real> face_pts(nface*n_new_pts*dim, 0.0);
-  if (!mesh->has_tag(2, "interp_pts")) {
-    auto calc_face_pts = OMEGA_H_LAMBDA (LO i) {
-      auto e0 = fe2e[i*3];
-      auto e1 = fe2e[i*3 + 1];
-      auto e2 = fe2e[i*3 + 2];
-      for (LO d = 0; d < dim; ++d) {
-        face_pts[i*n_new_pts*dim + d] =
-          (1.0/3.0)*old_ctrl_pts[e0*old_n_ctrl_pts*dim + d] +
-          (1.0/3.0)*old_ctrl_pts[e1*old_n_ctrl_pts*dim + d] +
-          (1.0/3.0)*old_ctrl_pts[e2*old_n_ctrl_pts*dim + d];
+  Write<LO> face_order(nface, 1);
+  auto calc_face_order = OMEGA_H_LAMBDA (LO i) {
+    for (LO e = 0; e < 3; ++e) {
+      auto adj_edge = fe2e[i*3 + e];
+      if (edge_order[adj_edge] == 2) {
+        face_order[i] = 2;
+        break;
+      }
+    }
+  };
+  parallel_for(nface, calc_face_order);
+  mesh->add_tag(2, "face_order", 1, LOs(face_order));
+
+  if (dim == 3) {
+    auto nrgn = mesh->nelems();
+    auto rf2f = mesh->get_adj(3, 2).ab2b;
+    Write<LO> rgn_order(nrgn, 1);
+    auto calc_rgn_order = OMEGA_H_LAMBDA (LO i) {
+      for (LO f = 0; f < 4; ++f) {
+        auto adj_face = rf2f[i*4 + f];
+        if (face_order[adj_face] == 2) {
+          rgn_order[i] = 2;
+          break;
+        }
       }
     };
-    parallel_for(nface, calc_face_pts);
+    parallel_for(nrgn, calc_rgn_order);
+    mesh->add_tag(3, "rgn_order", 1, LOs(rgn_order));
   }
-  mesh->set_tag_for_ctrlPts(2, Reals(face_pts));
-  */
 
   return;
 }
