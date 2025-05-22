@@ -351,7 +351,8 @@ void var_order_2to1(Mesh* mesh) {
       }
 
       if ((std::abs(m[0] - m[1]) < EPSILON) && 
-          (std::abs(m[0] - m[2]) < EPSILON)) {
+          (std::abs(m[0] - m[2]) < EPSILON) &&
+          ((m[0] >= 0.) && (m[0] <= 1.))) {
         edge_order[i] = 1;
       }
       else {
