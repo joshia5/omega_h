@@ -341,19 +341,23 @@ void var_order_2to1(Mesh* mesh) {
     auto v0 = ev2v[i*2];
     auto v1 = ev2v[i*2 + 1];
     if (dim == 3) {
-      Omega_h_fail("working on dim 2\n");
-      /*
-      Vector<3> c1;
-      Vector<3> c2;
+      Vector<3> p0, p2, p1, m;
       for (LO d = 0; d < dim; ++d) {
-        c1[d] = (1.0/3.0)*coords[v0*dim + d] +
-          (2.0/3.0)*old_ctrl_pts[i*old_n_ctrl_pts*dim + d];
-        c2[d] = (2.0/3.0)*old_ctrl_pts[i*old_n_ctrl_pts*dim + d] +
-          (1.0/3.0)*coords[v1*dim + d];
-        new_pts[i*n_new_pts*dim + d] = c1[d];
-        new_pts[i*n_new_pts*dim + dim + d] = c2[d];
+        p0[d] = coords[v0*dim + d];
+        p2[d] = coords[v1*dim + d];
+        p1[d] = old_ctrl_pts[i*old_n_ctrl_pts*dim + d];
+      
+        m[d] = (p1[d]-p0[d])/(p2[d]-p0[d]);
       }
-      */
+
+      if ((std::abs(m[0] - m[1]) < EPSILON) && 
+          (std::abs(m[0] - m[2]) < EPSILON)) {
+        edge_order[i] = 1;
+      }
+      else {
+        edge_order[i] = 2;
+        atomic_increment(&n_quadratic_edges[0]);
+      }
     }
     else {
       OMEGA_H_CHECK (dim == 2);
@@ -369,9 +373,9 @@ void var_order_2to1(Mesh* mesh) {
       m = (p2[1]-p0[1])/(p2[0]-p0[0]);
       c = p2[1] - (m*p2[0]);
       //printf("verif pt %1.15f eps %1.15f \n", (p0[1] - m*p0[0] - c) , EPSILON);
-      OMEGA_H_CHECK((p0[1] - m*p0[0] - c) < EPSILON);
+      OMEGA_H_CHECK(std::abs(p0[1] - m*p0[0] - c) < EPSILON);
 
-      if ((p1[1] - m*p1[0] - c) < EPSILON) {
+      if (std::abs(p1[1] - m*p1[0] - c) < EPSILON) {
         //printf("straight edge\n");
         edge_order[i] = 1;
       }
