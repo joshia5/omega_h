@@ -373,7 +373,7 @@ void var_order_2to1(Mesh* mesh) {
       }
       m = (p2[1]-p0[1])/(p2[0]-p0[0]);
       c = p2[1] - (m*p2[0]);
-      //printf("verif pt %1.15f eps %1.15f \n", (p0[1] - m*p0[0] - c) , EPSILON);
+      //printf("verif pt %1.15f eps %1.15f \n",(p0[1] - m*p0[0] - c), EPSILON);
       OMEGA_H_CHECK(std::abs(p0[1] - m*p0[0] - c) < EPSILON);
 
       if (std::abs(p1[1] - m*p1[0] - c) < EPSILON) {
