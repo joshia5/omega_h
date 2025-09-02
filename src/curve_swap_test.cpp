@@ -63,7 +63,7 @@ void test_collapse_boxCircle(Library *lib) {
 void test_antenna(Library *lib) {
   auto comm = lib->world();
 
-  auto mesh = binary::read("/lore/joshia5/Meshes/curved/antenna_6k.osh", comm);
+  auto mesh = binary::read("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/antenna_6k.osh", comm);
                             
   for (LO i = 0; i <= mesh.dim(); ++i) {
     if (!mesh.has_tag(i, "global")) {
@@ -98,7 +98,7 @@ void test_antenna(Library *lib) {
 void test_collapse_cubicSlab(Library *lib) {
   auto comm = lib->world();
 
-  auto mesh = binary::read("/lore/joshia5/Meshes/curved/cubic_slab-case1.osh", comm);
+  auto mesh = binary::read("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cubic_slab-case1.osh", comm);
                             
   for (LO i = 0; i <= mesh.dim(); ++i) {
     if (!mesh.has_tag(i, "global")) {
@@ -134,7 +134,7 @@ void test_collapse_cubicSlab(Library *lib) {
 void test_sphere(Library *lib) {
   auto comm = lib->world();
 
-  auto mesh = binary::read("/lore/joshia5/Meshes/curved/sphere_8.osh", comm);
+  auto mesh = binary::read("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/sphere_8.osh", comm);
                             
   for (LO i = 0; i <= mesh.dim(); ++i) {
     if (!mesh.has_tag(i, "global")) {
@@ -184,7 +184,7 @@ void test_swap_kova(Library *lib) {
   }
 
   vtk::FullWriter writer;
-  writer = vtk::FullWriter("/lore/joshia5/Meshes/curved/kovaCoarsen_bef.vtk", &mesh);
+  writer = vtk::FullWriter("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/kovaCoarsen_bef.vtk", &mesh);
   writer.write();
   calc_quad_ctrlPts_from_interpPts(&mesh);
   elevate_curve_order_2to3(&mesh);
@@ -296,8 +296,8 @@ void test_disc_swap(Library *lib) {
 void test_annulus3d_swap(Library *lib) {
   auto comm = lib->world();
 
-  auto mesh = meshsim::read("/lore/joshia5/Meshes/curved/annulus3d-24.sms",
-                            "/lore/joshia5/Models/curved/annulus3d.smd", comm);
+  auto mesh = meshsim::read("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus3d-24.sms",
+                            "/users/joshia5/lore.scorec.rpi.edu/Models/curved/annulus3d.smd", comm);
  
   calc_quad_ctrlPts_from_interpPts(&mesh);
   elevate_curve_order_2to3(&mesh);
@@ -362,8 +362,8 @@ void test_annulus3d_swap(Library *lib) {
 void test_annulus120_swap(Library *lib) {
   auto comm = lib->world();
 
-  auto mesh = meshsim::read("/lore/joshia5/Meshes/curved/annulus-120d-4.sms",
-                            "/lore/joshia5/Models/curved/annulus-120cut.smd", comm);
+  auto mesh = meshsim::read("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus-120d-4.sms",
+                            "/users/joshia5/lore.scorec.rpi.edu/Models/curved/annulus-120cut.smd", comm);
  
   calc_quad_ctrlPts_from_interpPts(&mesh);
   elevate_curve_order_2to3(&mesh);
@@ -579,13 +579,14 @@ void test_annulus120_swap(Library *lib) {
 void test_annulus_swap(Library *lib) {
   auto comm = lib->world();
 
-  auto mesh = meshsim::read("/lore/joshia5/Meshes/curved/annulus-8.sms",
-                            "/lore/joshia5/Models/curved/annulus-8.smd", comm);
+  auto mesh = meshsim::read("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus-8.sms",
+                            "/users/joshia5/lore.scorec.rpi.edu/Models/curved/annulus-8.smd", comm);
  
   calc_quad_ctrlPts_from_interpPts(&mesh);
   elevate_curve_order_2to3(&mesh);
   mesh.add_tag<Real>(0, "bezier_pts", mesh.dim(), mesh.coords());
 
+  /*
   auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
   build_cubic_wireframe_2d(&mesh, &wireframe_mesh, 20);
@@ -601,6 +602,7 @@ void test_annulus_swap(Library *lib) {
   writer = vtk::FullWriter(
       "/lore/joshia5/Meshes/curved/annulus-8_full.vtk", &mesh);
   writer.write();
+  */
 
   auto opts = AdaptOpts(&mesh);
   opts.should_coarsen = false;
@@ -620,6 +622,7 @@ void test_annulus_swap(Library *lib) {
     swap_edges(&mesh, opts);
   }
 
+  /*
   wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
   build_cubic_wireframe_2d(&mesh, &wireframe_mesh, 20);
@@ -640,6 +643,7 @@ void test_annulus_swap(Library *lib) {
       "/lore/joshia5/Meshes/curved/annulus-8-swap_2itr_full.vtk", &mesh);
   writer.write();
   binary::write("/lore/joshia5/Meshes/curved/annulus-8_swap_2itr.osh", &mesh);
+  */
   //mesh.ask_qualities();
 
   return;
@@ -648,8 +652,8 @@ void test_annulus_swap(Library *lib) {
 void test_annulus_swap_p4(Library *lib) {
   auto comm = lib->world();
 
-  auto mesh = meshsim::read("/lore/joshia5/Meshes/curved/annulus-8.sms",
-                            "/lore/joshia5/Models/curved/annulus-8.smd", comm);
+  auto mesh = meshsim::read("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus-8.sms",
+                            "/users/joshia5/lore.scorec.rpi.edu/Models/curved/annulus-8.smd", comm);
  
   calc_quad_ctrlPts_from_interpPts(&mesh);
   elevate_curve_order_2to3(&mesh);
