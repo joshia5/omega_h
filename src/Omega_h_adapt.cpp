@@ -220,6 +220,29 @@ static void satisfy_lengths_refine(Mesh* mesh, AdaptOpts const& opts) {
   } while (did_anything);
 }
 
+static bool satisfy_quality_crv(Mesh* mesh, AdaptOpts const& opts) {
+  OMEGA_H_TIME_FUNCTION;
+  if (min_fixable_quality(mesh, opts) >= opts.min_quality_desired) return true;
+  if ((opts.verbosity >= EACH_REBUILD) && can_print(mesh)) {
+    std::cout << "addressing element qualities\n";
+  }
+  do {
+    if (opts.should_coarsen_slivers && coarsen_slivers(mesh, opts)) {
+      post_rebuild(mesh, opts);
+      continue;
+    }
+    if (opts.should_swap && swap_edges(mesh, opts)) {
+      post_rebuild(mesh, opts);
+      continue;
+    }
+    if ((opts.verbosity > SILENT) && can_print(mesh)) {
+      std::cout << "could not satisfy quality\n";
+    }
+    return false;
+  } while (min_fixable_quality(mesh, opts) < opts.min_quality_desired);
+  return true;
+}
+
 static bool satisfy_quality(Mesh* mesh, AdaptOpts const& opts) {
   OMEGA_H_TIME_FUNCTION;
   if (min_fixable_quality(mesh, opts) >= opts.min_quality_desired) return true;
@@ -310,7 +333,12 @@ static void snap_and_satisfy_quality(Mesh* mesh, AdaptOpts const& opts) {
     }
   } else
 #endif
-    satisfy_quality(mesh, opts);
+    if (!mesh->is_curved()) {
+      satisfy_quality(mesh, opts);
+    }
+    else {
+      satisfy_quality_crv(mesh, opts);
+    }
 }
 
 static void post_adapt(
