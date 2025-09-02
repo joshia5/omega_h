@@ -54,7 +54,7 @@ bool swap_edges_crv(Mesh* mesh, AdaptOpts const& opts) {
 }
 
 bool swap_edges(Mesh* mesh, AdaptOpts const& opts) {
-  if (mesh->is_curved() > 0) return swap_edges_crv(mesh, opts);
+  if (mesh->is_curved()) return swap_edges_crv(mesh, opts);
   OMEGA_H_TIME_FUNCTION;
   bool ret = false;
   if (mesh->dim() == 3)
