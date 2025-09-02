@@ -249,7 +249,7 @@ static void snap_and_satisfy_quality(Mesh* mesh, AdaptOpts const& opts) {
     ScopedTimer snap_timer("snap");
 
     //mesh->change_all_rcFieldsTorc();
-    
+
     mesh->set_parting(OMEGA_H_GHOSTED);
 
     //mesh->change_all_rcFieldsToMesh();
