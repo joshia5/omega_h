@@ -303,6 +303,7 @@ void test_annulus3d_swap(Library *lib) {
   elevate_curve_order_2to3(&mesh);
   mesh.add_tag<Real>(0, "bezier_pts", mesh.dim(), mesh.coords());
 
+  /*
   auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
   build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 4);
@@ -314,6 +315,7 @@ void test_annulus3d_swap(Library *lib) {
   build_cubic_curveVtk_3d(&mesh, &cubic_curveVtk_mesh, 4);
   vtuPath = "/lore/joshia5/Meshes/curved/annulus3d.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
+  */
 
   auto opts = AdaptOpts(&mesh);
   opts.should_coarsen = false;
@@ -327,13 +329,13 @@ void test_annulus3d_swap(Library *lib) {
   mesh.set_tag(VERT, "metric", Reals(mesh.nverts(), 1));
   auto valid_tris_bef = checkValidity_3d(&mesh, LOs(mesh.nregions(), 0, 1));
   auto qual = calc_crvQuality_3d(&mesh);
-  /*
   //auto quals = askQuality_2d(&mesh, LOs(mesh.nfaces(), 0, 1), 2);
   for (LO adapt_itr = 0; adapt_itr < 1; ++adapt_itr) {
     fprintf(stderr, "itr %d\n", adapt_itr);
     swap_edges(&mesh, opts);
   }
 
+  /*
   wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
   build_cubic_wireframe_2d(&mesh, &wireframe_mesh, 4);
@@ -721,10 +723,10 @@ int main(int argc, char** argv) {
   auto lib = Library(&argc, &argv);
 
   //test_annulus120_swap(&lib); //2d 120 degree cut
-  test_annulus_swap(&lib); //2d
+  //test_annulus_swap(&lib); //2d
   //test_annulus_swap_p4(&lib); //2d
 
-  //test_annulus3d_swap(&lib); //2d
+  test_annulus3d_swap(&lib); //2d
 
   //test_disc_swap(&lib); //2d
   //test_swap_kova(&lib); //3d
