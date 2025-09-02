@@ -221,6 +221,7 @@ static void satisfy_lengths_refine(Mesh* mesh, AdaptOpts const& opts) {
 }
 
 static bool satisfy_quality_crv(Mesh* mesh, AdaptOpts const& opts) {
+  std::cout << "satisfy crv quals\n";
   OMEGA_H_TIME_FUNCTION;
   if (min_fixable_quality(mesh, opts) >= opts.min_quality_desired) return true;
   if ((opts.verbosity >= EACH_REBUILD) && can_print(mesh)) {
