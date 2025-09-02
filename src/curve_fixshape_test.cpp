@@ -6,6 +6,8 @@
 //#include <Omega_h_curve_coarsen.hpp>
 #include <Omega_h_curve_validity_3d.hpp>
 
+using namespace Omega_h;
+
 void test_annulus3d(Library *lib) {
   auto comm = lib->world();
 
@@ -75,10 +77,8 @@ void test_annulus3d(Library *lib) {
 
 int main(int argc, char** argv) {
   auto lib = Library(&argc, &argv);
-
-  //test_annulus_swap(&lib); //2d
-
-  test_annulus3d(&lib); //2d
-
+  
+  test_annulus3d(&lib);
+  
   return 0;
 }

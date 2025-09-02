@@ -227,7 +227,11 @@ static bool satisfy_quality_crv(Mesh* mesh, AdaptOpts const& opts) {
   if ((opts.verbosity >= EACH_REBUILD) && can_print(mesh)) {
     std::cout << "addressing element qualities\n";
   }
+  /* itrs for test */
+  int max_itr = 2;
+  int i = 0;
   do {
+    ++i;
     if (opts.should_coarsen_slivers && coarsen_slivers(mesh, opts)) {
       post_rebuild(mesh, opts);
       continue;
@@ -240,7 +244,8 @@ static bool satisfy_quality_crv(Mesh* mesh, AdaptOpts const& opts) {
       std::cout << "could not satisfy quality\n";
     }
     return false;
-  } while (min_fixable_quality(mesh, opts) < opts.min_quality_desired);
+  } while (i < max_itr);
+  //} while (min_fixable_quality(mesh, opts) < opts.min_quality_desired);
   return true;
 }
 
