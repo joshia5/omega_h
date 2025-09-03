@@ -1,11 +1,9 @@
 #include <Omega_h_build.hpp>
 #include <Omega_h_swap.hpp>
 #include <Omega_h_library.hpp>
-//#include <Omega_h_metric.hpp>
 #include <Omega_h_file.hpp>
 #include <Omega_h_beziers.hpp>
 #include <Omega_h_bezier_interp.hpp>
-//#include <Omega_h_for.hpp>
 #include <Omega_h_curve_coarsen.hpp>
 #include <Omega_h_curve_validity_3d.hpp>
 
