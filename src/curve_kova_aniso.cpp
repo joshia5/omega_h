@@ -89,7 +89,7 @@ void run_case(Mesh* mesh, char const* vtk_path) {
   std::cout << "total time: " << (t1 - t0) << " seconds\n";
 }
 
-void test_sim_kova_quadratic(Library *lib) {
+void test_sim_kova(Library *lib) {
   auto comm = lib->world();
   auto mesh = binary::read("/users/joshia5/Meshes/curved/KovaGeomSim-quadratic_123tet.osh", comm);
   if (!mesh.has_tag(0, "bezier_pts")) 
@@ -169,7 +169,7 @@ int main(int argc, char** argv) {
   path_3d_vtk = argv[5];
 
   */
-  test_sim_kova_quadratic(&lib);
+  test_sim_kova(&lib);
 
   return 0;
 }
