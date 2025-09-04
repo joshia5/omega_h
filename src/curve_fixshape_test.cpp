@@ -1,16 +1,19 @@
 #include <Omega_h_adapt.hpp>
-#include <Omega_h_library.hpp>
-#include <Omega_h_file.hpp>
 #include <Omega_h_beziers.hpp>
+#include <Omega_h_build.hpp>
 #include <Omega_h_curve_validity_3d.hpp>
+#include <Omega_h_file.hpp>
+#include <Omega_h_library.hpp>
 
 using namespace Omega_h;
 
 void test_annulus3d(Library *lib) {
   auto comm = lib->world();
 
-  auto mesh = meshsim::read("/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus3d-24.sms",
-                            "/users/joshia5/lore.scorec.rpi.edu/Models/curved/annulus3d.smd", comm);
+  auto mesh = meshsim::read(
+      "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus3d-24.sms",
+      "/users/joshia5/lore.scorec.rpi.edu/Models/curved/annulus3d.smd",
+      comm);
  
   calc_quad_ctrlPts_from_interpPts(&mesh);
   elevate_curve_order_2to3(&mesh);
@@ -48,19 +51,20 @@ void test_annulus3d(Library *lib) {
     adapt(&mesh, opts);
   }
 
-  /*
-  wireframe_mesh = Mesh(lib);
+  auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
   build_cubic_wireframe_2d(&mesh, &wireframe_mesh, 4);
-  vtuPath =
-    "/lore/joshia5/Meshes/curved/annulus-8-swap_wire.vtu";
+  std::string vtuPath =
+    "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus-3d-fs_wire.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
-  cubic_curveVtk_mesh = Mesh(lib);
+  auto cubic_curveVtk_mesh = Mesh(lib);
   cubic_curveVtk_mesh.set_comm(comm);
   build_cubic_curveVtk_2d(&mesh, &cubic_curveVtk_mesh, 4);
-  vtuPath = "/lore/joshia5/Meshes/curved/annulus-8-swap.vtu";
+  vtuPath =
+    "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus-3d-fs.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
-  auto valid_tris_aft = checkValidity_2d(&mesh, LOs(mesh.nfaces(), 0, 1), 2);
+  auto valid_tris_aft = checkValidity_3d(&mesh, LOs(mesh.nregions(), 0, 1));
+  /*
   //quals = askQuality_2d(&mesh, LOs(mesh.nfaces(), 0, 1), 2);
 
   vtk::FullWriter writer;

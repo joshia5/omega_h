@@ -150,12 +150,14 @@ void print_adapt_histograms(Mesh* mesh, AdaptOpts const& opts) {
   auto owned_qualities =
       mesh->owned_array(mesh->dim(), mesh->ask_qualities(), 1);
   auto qual_sum = get_sum(mesh->comm(), owned_qualities);
+  auto qual_min = get_min(mesh->comm(), owned_qualities);
   auto global_nelems = mesh->nglobal_ents(mesh->dim());
   auto avg_qual = qual_sum / global_nelems;
   if (can_print(mesh)) {
     print_histogram(qh, "quality");
     print_histogram(lh, "length");
     std::cout << "average quality: " << avg_qual << '\n';
+    std::cout << "worst quality: " << qual_min << '\n';
   }
 }
 
@@ -245,6 +247,7 @@ static bool satisfy_quality_crv(Mesh* mesh, AdaptOpts const& opts) {
     }
     return false;
   } while (i < max_itr);
+  /* remove itrs */
   //} while (min_fixable_quality(mesh, opts) < opts.min_quality_desired);
   return true;
 }

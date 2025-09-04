@@ -111,7 +111,6 @@ void swap_curved_verts_and_edges(Mesh *mesh, Mesh *new_mesh, const LOs old2new,
   };
   parallel_for(nold_edges, std::move(copy_sameedgePts),
       "copy_same_edgectrlPts");
-  fprintf(stderr, "copied same edges : line 112\n");
   auto prod_edge_points = OMEGA_H_LAMBDA(LO i) {
     LO e = prods2new[i];
     auto const v0 = new_ev2v[e*2 + 0];
