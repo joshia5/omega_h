@@ -16,7 +16,7 @@
 #include "Omega_h_curve_validity_3d.hpp"
 
 #include "Omega_h_file.hpp"
-#include<Omega_h_build.hpp>
+#include "Omega_h_build.hpp"
 
 namespace Omega_h {
 
@@ -182,7 +182,7 @@ static void refine_element_based_crv(Mesh* mesh, AdaptOpts const& opts,
         else {
           OMEGA_H_CHECK(mesh->get_max_order() == 2);
           if (mesh->dim() == 2) {
-            Omega_h_fail("p2 crv refinement in 2d not supported yet!\n");
+            Omega_h_fail("error aborting\n");
           }
           else {
             OMEGA_H_CHECK(mesh->dim() == 3);
@@ -254,10 +254,25 @@ static void refine_element_based_crv(Mesh* mesh, AdaptOpts const& opts,
     }
   }
   */
-
   if (should_modify_mesh > 0) {
     *mesh = new_mesh;
+    if (opts.verbosity >= EXTRA_STATS && comm->rank() == 0) {
+      printf("writing refine mesh\n");
+      auto wireframe_mesh = Mesh(comm->library());
+      wireframe_mesh.set_comm(comm);
+      build_cubic_wireframe_3d(mesh, &wireframe_mesh, 4);
+      std::string vtuPath =
+        "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/refine_wire.vtu";
+      vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
+      auto cubic_curveVtk_mesh = Mesh(comm->library());
+      cubic_curveVtk_mesh.set_comm(comm);
+      build_cubic_curveVtk_3d(mesh, &cubic_curveVtk_mesh, 4);
+      vtuPath =
+        "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/refine.vtu";
+      vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
+    }
   }
+  return;
 }
 
 bool refine(Mesh* mesh, AdaptOpts const& opts) {
