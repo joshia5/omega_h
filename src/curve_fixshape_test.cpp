@@ -17,9 +17,11 @@ static void set_target_metric(Mesh* mesh) {
   auto f = OMEGA_H_LAMBDA(LO v) {
     auto y = coords[v * dim + (dim - 2)];
     auto h = Vector<dim>();
-    h[0] = 0.1; h[1] = 0.1; h[2] = 0.1;
+    for (Int i = 0; i < dim; ++i)
+    h[i] = 0.1+0.3*std::abs(y-0.05);
+    //h[0] = 0.3; h[1] = 0.3; h[2] = 0.3;
     //for (Int i = 0; i < dim - 1; ++i) h[i] = 0.1;
-    h[dim - 2] = 0.001 + 0.198 * std::abs(y - 0.5);
+    //h[dim - 2] = 0.001 + 0.198 * std::abs(y - 0.5);
     auto m = diagonal(metric_eigenvalues_from_lengths(h));
     set_symm(target_metrics_w, v, m);
   };
@@ -49,11 +51,11 @@ void run_case(Mesh* mesh, char const* vtk_path) {
   opts.max_length_allowed = opts.max_length_desired * 2.0;
   opts.should_smooth_snap = 0;
   opts.should_coarsen = 0;
-  opts.should_swap = 0;
-  opts.should_coarsen_slivers = 0;
+  opts.should_swap = 1;
+  opts.should_coarsen_slivers = 1;
   opts.check_crv_qual = 0;
-  opts.min_quality_allowed = 0.000001;
-  opts.min_quality_desired = 0.1;
+  opts.min_quality_allowed = 0.1;
+  opts.min_quality_desired = 0.2;
   Now t0 = now();
   auto desired_group_nelems = 2000;
   while (approach_metric(mesh, opts)) {
@@ -86,7 +88,7 @@ void test_cyl_grv(Library *lib) {
   auto comm = lib->world();
 
   auto mesh = meshsim::read(
-      "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv-200.sms",
+      "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv-5k.sms",
       "/users/joshia5/lore.scorec.rpi.edu/Models/curved/cyl_grv.smd",
       comm);
  
@@ -117,13 +119,13 @@ void test_cyl_grv(Library *lib) {
 
   auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
-  build_cubic_wireframe_2d(&mesh, &wireframe_mesh, 4);
+  build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 4);
   std::string vtuPath =
     "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv-shock_wire.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
   auto cubic_curveVtk_mesh = Mesh(lib);
   cubic_curveVtk_mesh.set_comm(comm);
-  build_cubic_curveVtk_2d(&mesh, &cubic_curveVtk_mesh, 4);
+  build_cubic_curveVtk_3d(&mesh, &cubic_curveVtk_mesh, 4);
   vtuPath =
     "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv_shock.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
@@ -178,13 +180,13 @@ void test_annulus3d(Library *lib) {
 
   auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
-  build_cubic_wireframe_2d(&mesh, &wireframe_mesh, 4);
+  build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 4);
   std::string vtuPath =
     "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus-3d-fs_wire.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
   auto cubic_curveVtk_mesh = Mesh(lib);
   cubic_curveVtk_mesh.set_comm(comm);
-  build_cubic_curveVtk_2d(&mesh, &cubic_curveVtk_mesh, 4);
+  build_cubic_curveVtk_3d(&mesh, &cubic_curveVtk_mesh, 4);
   vtuPath =
     "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/annulus-3d-fs.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
