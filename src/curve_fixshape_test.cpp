@@ -127,11 +127,12 @@ void test_cyl_grv(Library *lib) {
   auto valid_tris_bef = checkValidity_3d(&mesh, LOs(mesh.nregions(), 0, 1));
   auto qual = calc_crvQuality_3d(&mesh);
   run_case<3>(&mesh, NULL);
-  //auto quals = askQuality_2d(&mesh, LOs(mesh.nfaces(), 0, 1), 2);
+  /*
   for (LO adapt_itr = 0; adapt_itr < 1; ++adapt_itr) {
     fprintf(stderr, "itr %d\n", adapt_itr);
     adapt(&mesh, opts);
   }
+  */
 
   auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
