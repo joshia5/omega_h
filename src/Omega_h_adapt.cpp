@@ -140,7 +140,15 @@ void print_adapt_histograms(Mesh* mesh, AdaptOpts const& opts) {
   }
   else {
     OMEGA_H_CHECK ((mesh->is_curved() > 0) && (mesh->get_max_order() == 3));
-    quals = calc_crvQuality_3d(mesh);
+    if (mesh->dim() == 3) {
+      quals = calc_crvQuality_3d(mesh);
+    }
+    else if (mesh->dim() == 2) {
+      quals = calc_crvQuality_2d(mesh);
+    }
+    else {
+      Omega_h_fail("unexpected dim \n");
+    }
   }
   auto qh = get_histogram(mesh, mesh->dim(), opts.nquality_histogram_bins, 0.0,
       1.0, quals);
