@@ -50,7 +50,7 @@ void run_case(Mesh* mesh, char const* vtk_path) {
   opts.length_histogram_max = 2.0;
   opts.max_length_allowed = opts.max_length_desired * 2.0;
   opts.should_smooth_snap = 0;
-  opts.should_coarsen = 0;
+  opts.should_coarsen = 1;
   opts.should_swap = 1;
   opts.should_coarsen_slivers = 1;
   opts.check_crv_qual = 0;
@@ -96,6 +96,23 @@ void test_cyl_grv(Library *lib) {
   elevate_curve_order_2to3(&mesh);
   mesh.add_tag<Real>(0, "bezier_pts", mesh.dim(), mesh.coords());
 
+  /*
+  auto wireframe_mesh = Mesh(lib);
+  wireframe_mesh.set_comm(comm);
+  build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 8);
+  std::string vtuPath =
+    "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv-5k_wire.vtu";
+  vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
+  auto cubic_curveVtk_mesh = Mesh(lib);
+  cubic_curveVtk_mesh.set_comm(comm);
+  build_cubic_curveVtk_3d(&mesh, &cubic_curveVtk_mesh, 8);
+  vtuPath =
+    "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv_5k.vtu";
+  vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
+  auto valid_tris_aft = checkValidity_3d(&mesh, LOs(mesh.nregions(), 0, 1));
+
+  while (-1) {
+  }
   auto opts = AdaptOpts(&mesh);
   opts.should_coarsen = false;
   opts.should_coarsen_slivers = true;
@@ -104,28 +121,27 @@ void test_cyl_grv(Library *lib) {
   opts.verbosity = EXTRA_STATS;
   opts.min_quality_desired = 0.99;
   opts.min_quality_allowed = 0.98;
+  */
   mesh.add_tag<Real>(VERT, "metric", 1);
   mesh.set_tag(VERT, "metric", Reals(mesh.nverts(), 1));
   auto valid_tris_bef = checkValidity_3d(&mesh, LOs(mesh.nregions(), 0, 1));
   auto qual = calc_crvQuality_3d(&mesh);
   run_case<3>(&mesh, NULL);
-  /*
   //auto quals = askQuality_2d(&mesh, LOs(mesh.nfaces(), 0, 1), 2);
   for (LO adapt_itr = 0; adapt_itr < 1; ++adapt_itr) {
     fprintf(stderr, "itr %d\n", adapt_itr);
     adapt(&mesh, opts);
   }
-  */
 
   auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
-  build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 4);
+  build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 8);
   std::string vtuPath =
     "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv-shock_wire.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
   auto cubic_curveVtk_mesh = Mesh(lib);
   cubic_curveVtk_mesh.set_comm(comm);
-  build_cubic_curveVtk_3d(&mesh, &cubic_curveVtk_mesh, 4);
+  build_cubic_curveVtk_3d(&mesh, &cubic_curveVtk_mesh, 8);
   vtuPath =
     "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv_shock.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
