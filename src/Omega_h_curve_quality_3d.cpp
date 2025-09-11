@@ -42,7 +42,8 @@ Reals calc_crvQuality_3d(Mesh *mesh) {
     auto const minJ = calcMinJacDet(nodes_det);
     auto const maxJ = calcMaxJacDet(nodes_det);
     if (minJ > 0.) {
-      Q[n] = std::pow(std::pow((minJ/maxJ), 1./3.)*qs[n], 1.0);
+      Q[n] = std::pow(std::pow((minJ/maxJ), 1./3.), 1.0);
+      //Q[n] = std::pow(std::pow((minJ/maxJ), 1./3.)*qs[n], 1.0);
       if (Q[n] < 0.01) printf("low quality %f for element %d\n", Q[n], n);
     }
     else {
