@@ -144,7 +144,8 @@ void print_adapt_histograms(Mesh* mesh, AdaptOpts const& opts) {
       quals = calc_crvQuality_3d(mesh);
     }
     else if (mesh->dim() == 2) {
-      quals = calc_crvQuality_2d(mesh);
+      Omega_h_fail("2d wip\n");
+      //quals = calc_crvQuality_2d(mesh);
     }
     else {
       Omega_h_fail("unexpected dim \n");
