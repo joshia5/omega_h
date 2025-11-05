@@ -50,7 +50,8 @@ void test_adapt_inclusion(Library *lib) {
   fprintf(stderr, "initial mesh %d tet\n", mesh.nregions());
   I8 max_adapt_itr = 1;
   for (LO adapt_itr = 0; adapt_itr < max_adapt_itr; ++adapt_itr) {
-    while (approach_metric(&mesh, opts) && mesh.nelems() < 10000) {
+    //while (approach_metric(&mesh, opts) && mesh.nelems() < 10000) {
+      approach_metric(&mesh, opts);
       adapt(&mesh, opts);
     }
   }
@@ -71,16 +72,18 @@ void test_adapt_inclusion(Library *lib) {
   vtk::write_simplex_connectivity(vtuPath.c_str(), &curveVtk_mesh, 2);
   */
 
-  auto const nedge = mesh->nedges();
-  auto const ev2v = mesh->get_adj(1, 0).ab2b;
-  //auto const coords = mesh->coords();
-  auto const vertCtrlPts = mesh->get_ctrlPts(0);
+  auto const nedge = mesh.nedges();
+  auto const ev2v = mesh.get_adj(1, 0).ab2b;
+  //auto const coords = mesh.coords();
+  auto const vertCtrlPts = mesh.get_ctrlPts(0);
+  auto const old_edgeCtrlPts = mesh.get_ctrlPts(1);
   Write<Real> edge_ctrlPts(nedge*n_edge_pts*dim, INT8_MAX);
-  auto const edge_gdim = mesh->get_array<I8>(1, "class_dim");
-  auto const edge_gid = mesh->get_array<LO>(1, "class_id");
+  auto const edge_gdim = mesh.get_array<I8>(1, "class_dim");
+  auto const edge_gid = mesh.get_array<LO>(1, "class_id");
+  I8 const n_edge_pts = 2;
+  I8 const dim = 3;
 
-  auto stbdr_edge_points = OMEGA_H_LAMBDA(LO i) {
-    LO e = prods2new[i];
+  auto stbdr_edge_points = OMEGA_H_LAMBDA(LO e) {
     if ((edge_gdim[e] == 2) && (edge_gid[e] != 190)) {
       auto const v0 = ev2v[e*2 + 0];
       auto const v1 = ev2v[e*2 + 1];
@@ -91,9 +94,14 @@ void test_adapt_inclusion(Library *lib) {
           (vertCtrlPts[v1*dim + j] - vertCtrlPts[v0*dim + j])*(2.0/3.0);
       }
     }
+    else {
+      for (LO j=0; j<dim*n_edge_pts; ++j) {
+        edge_ctrlPts[e*n_edge_pts*dim + j] = old_edgeCtrlPts[e*n_edge_pts*dim + j];
+      }
+    }
   };
   parallel_for(nedge, std::move(stbdr_edge_points), "stbdr_edge_points");
-  new_mesh->set_tag_for_ctrlPts(1, Reals(edge_ctrlPts));
+  mesh.set_tag_for_ctrlPts(1, Reals(edge_ctrlPts));
 
   return;
 }
