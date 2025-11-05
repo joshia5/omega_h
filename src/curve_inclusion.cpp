@@ -14,7 +14,8 @@ void test_adapt_inclusion(Library *lib) {
   auto comm = lib->world();
 
   auto mesh = binary::read(
-      "/lore/joshia5/Meshes/curved/inclusion_3p_sizes_2.osh", comm);
+      "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/inclusion_3p_sizes_2.osh"
+      , comm);
                             
   for (LO i = 0; i <= mesh.dim(); ++i) {
     if (!mesh.has_tag(i, "global")) {
@@ -69,6 +70,31 @@ void test_adapt_inclusion(Library *lib) {
   vtuPath = "../omega_h/meshes/box_circleCut_ref5k_curveVtk.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &curveVtk_mesh, 2);
   */
+
+  auto const nedge = mesh->nedges();
+  auto const ev2v = mesh->get_adj(1, 0).ab2b;
+  //auto const coords = mesh->coords();
+  auto const vertCtrlPts = mesh->get_ctrlPts(0);
+  Write<Real> edge_ctrlPts(nedge*n_edge_pts*dim, INT8_MAX);
+  auto const edge_gdim = mesh->get_array<I8>(1, "class_dim");
+  auto const edge_gid = mesh->get_array<LO>(1, "class_id");
+
+  auto stbdr_edge_points = OMEGA_H_LAMBDA(LO i) {
+    LO e = prods2new[i];
+    if ((edge_gdim[e] == 2) && (edge_gid[e] != 190)) {
+      auto const v0 = ev2v[e*2 + 0];
+      auto const v1 = ev2v[e*2 + 1];
+      for (LO j=0; j<dim; ++j) {
+        edge_ctrlPts[e*n_edge_pts*dim + j] = vertCtrlPts[v0*dim + j] +
+          (vertCtrlPts[v1*dim + j] - vertCtrlPts[v0*dim + j])/3.0;
+        edge_ctrlPts[e*n_edge_pts*dim + dim + j] = vertCtrlPts[v0*dim + j] +
+          (vertCtrlPts[v1*dim + j] - vertCtrlPts[v0*dim + j])*(2.0/3.0);
+      }
+    }
+  };
+  parallel_for(nedge, std::move(stbdr_edge_points), "stbdr_edge_points");
+  new_mesh->set_tag_for_ctrlPts(1, Reals(edge_ctrlPts));
+
   return;
 }
 
