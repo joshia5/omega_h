@@ -256,7 +256,7 @@ static void refine_element_based_crv(Mesh* mesh, AdaptOpts const& opts,
   */
   if (should_modify_mesh > 0) {
     *mesh = new_mesh;
-    if (opts.verbosity >= EXTRA_STATS && comm->rank() == 0) {
+    if (opts.verbosity >= WRITE_FILE && comm->rank() == 0) {
       printf("writing refine mesh\n");
       auto wireframe_mesh = Mesh(comm->library());
       wireframe_mesh.set_comm(comm);
