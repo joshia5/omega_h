@@ -40,6 +40,8 @@ void test_adapt_inclusion(Library *lib) {
   vtk::write_simplex_connectivity(vtuPath.c_str(), &curveVtk_mesh, 2);
   */
 
+  auto old_mesh = mesh;
+
   auto opts = AdaptOpts(&mesh);
   opts.should_swap = 1;
   opts.should_coarsen = 1;
@@ -51,38 +53,21 @@ void test_adapt_inclusion(Library *lib) {
   I8 max_adapt_itr = 1;
   for (LO adapt_itr = 0; adapt_itr < max_adapt_itr; ++adapt_itr) {
     //while (approach_metric(&mesh, opts) && mesh.nelems() < 10000) {
-      approach_metric(&mesh, opts);
+      //approach_metric(&mesh, opts, 1);
       adapt(&mesh, opts);
-    }
+    //}
   }
   auto qual = calc_crvQuality_3d(&mesh);
-  /*
-  writer = vtk::FullWriter(
-      "../omega_h/meshes/boxCircle_aft.vtk", &mesh);
-  writer.write();
-  auto wireframe_mesh = Mesh(comm->library());
-  wireframe_mesh.set_comm(comm);
-  build_cubic_wireframe_3d(&mesh, &wireframe_mesh);
-  std::string vtuPath = "../omega_h/meshes/box_circleCut_ref5k_wire.vtu";
-  vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
-  auto curveVtk_mesh = Mesh(comm->library());
-  curveVtk_mesh.set_comm(comm);
-  build_cubic_curveVtk_3d(&mesh, &curveVtk_mesh);
-  vtuPath = "../omega_h/meshes/box_circleCut_ref5k_curveVtk.vtu";
-  vtk::write_simplex_connectivity(vtuPath.c_str(), &curveVtk_mesh, 2);
-  */
 
+  I8 const n_edge_pts = 2;
+  I8 const dim = 3;
   auto const nedge = mesh.nedges();
   auto const ev2v = mesh.get_adj(1, 0).ab2b;
-  //auto const coords = mesh.coords();
   auto const vertCtrlPts = mesh.get_ctrlPts(0);
   auto const old_edgeCtrlPts = mesh.get_ctrlPts(1);
   Write<Real> edge_ctrlPts(nedge*n_edge_pts*dim, INT8_MAX);
   auto const edge_gdim = mesh.get_array<I8>(1, "class_dim");
   auto const edge_gid = mesh.get_array<LO>(1, "class_id");
-  I8 const n_edge_pts = 2;
-  I8 const dim = 3;
-
   auto stbdr_edge_points = OMEGA_H_LAMBDA(LO e) {
     if ((edge_gdim[e] == 2) && (edge_gid[e] != 190)) {
       auto const v0 = ev2v[e*2 + 0];
@@ -102,7 +87,24 @@ void test_adapt_inclusion(Library *lib) {
   };
   parallel_for(nedge, std::move(stbdr_edge_points), "stbdr_edge_points");
   mesh.set_tag_for_ctrlPts(1, Reals(edge_ctrlPts));
-
+  
+  qual = calc_crvQuality_3d(&mesh);
+  
+  auto wireframe_mesh = Mesh(comm->library());
+  wireframe_mesh.set_comm(comm);
+  build_cubic_wireframe_3d(&old_mesh, &wireframe_mesh);
+  std::string vtuPath = "../../../Meshes/curved/inclusion_adpt3k_wire"
+    + std::to_string(comm->rank())
+    +".vtu";
+  vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
+  auto curveVtk_mesh = Mesh(comm->library());
+  curveVtk_mesh.set_comm(comm);
+  build_cubic_curveVtk_3d(&old_mesh, &curveVtk_mesh);
+  vtuPath = "../../../Meshes/curved/inclusion_adpt3k_curveVtk"
+    + std::to_string(comm->rank())
+    +".vtu";
+  vtk::write_simplex_connectivity(vtuPath.c_str(), &curveVtk_mesh, 2);
+ 
   return;
 }
 
