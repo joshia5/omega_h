@@ -134,17 +134,47 @@ void test_cyl_grv(Library *lib) {
   }
   */
 
+  I8 const n_edge_pts = 2;
+  I8 const dim = 3;
+  auto const nedge = mesh.nedges();
+  auto const ev2v = mesh.get_adj(1, 0).ab2b;
+  auto const vertCtrlPts = mesh.get_ctrlPts(0);
+  auto const old_edgeCtrlPts = mesh.get_ctrlPts(1);
+  Write<Real> edge_ctrlPts(nedge*n_edge_pts*dim, INT8_MAX);
+  auto const edge_gdim = mesh.get_array<I8>(1, "class_dim");
+  auto const edge_gid = mesh.get_array<LO>(1, "class_id");
+  auto stbdr_edge_points = OMEGA_H_LAMBDA(LO e) {
+    if ((edge_gdim[e] == 2) && 
+        ((edge_gid[e] == 4) || (edge_gid[e] == 6))) {
+      auto const v0 = ev2v[e*2 + 0];
+      auto const v1 = ev2v[e*2 + 1];
+      for (LO j=0; j<dim; ++j) {
+        edge_ctrlPts[e*n_edge_pts*dim + j] = vertCtrlPts[v0*dim + j] +
+          (vertCtrlPts[v1*dim + j] - vertCtrlPts[v0*dim + j])/3.0;
+        edge_ctrlPts[e*n_edge_pts*dim + dim + j] = vertCtrlPts[v0*dim + j] +
+          (vertCtrlPts[v1*dim + j] - vertCtrlPts[v0*dim + j])*(2.0/3.0);
+      }
+    }
+    else {
+      for (LO j=0; j<dim*n_edge_pts; ++j) {
+        edge_ctrlPts[e*n_edge_pts*dim + j] = old_edgeCtrlPts[e*n_edge_pts*dim + j];
+      }
+    }
+  };
+  parallel_for(nedge, std::move(stbdr_edge_points), "stbdr_edge_points");
+  mesh.set_tag_for_ctrlPts(1, Reals(edge_ctrlPts));
+ 
   auto wireframe_mesh = Mesh(lib);
   wireframe_mesh.set_comm(comm);
   build_cubic_wireframe_3d(&mesh, &wireframe_mesh, 8);
   std::string vtuPath =
-    "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv-shock_wire.vtu";
+    "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv-shock-2_wire.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
   auto cubic_curveVtk_mesh = Mesh(lib);
   cubic_curveVtk_mesh.set_comm(comm);
   build_cubic_curveVtk_3d(&mesh, &cubic_curveVtk_mesh, 8);
   vtuPath =
-    "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv_shock.vtu";
+    "/users/joshia5/lore.scorec.rpi.edu/Meshes/curved/cyl_grv_shock-2.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &cubic_curveVtk_mesh, 2);
   auto valid_tris_aft = checkValidity_3d(&mesh, LOs(mesh.nregions(), 0, 1));
 
