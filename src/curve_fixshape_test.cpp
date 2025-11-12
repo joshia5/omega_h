@@ -51,11 +51,11 @@ void run_case(Mesh* mesh, char const* vtk_path) {
   opts.max_length_allowed = opts.max_length_desired * 2.0;
   opts.should_smooth_snap = 0;
   opts.should_coarsen = 1;
-  opts.should_swap = 0;
-  opts.should_coarsen_slivers = 0;
+  opts.should_swap = 1;
+  opts.should_coarsen_slivers = 1;
   opts.check_crv_qual = 0;
   opts.min_quality_allowed = 0.1;
-  opts.min_quality_desired = 0.25;
+  opts.min_quality_desired = 0.2;
   Now t0 = now();
   auto desired_group_nelems = 2000;
   while (approach_metric(mesh, opts)) {
