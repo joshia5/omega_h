@@ -398,19 +398,33 @@ void build_quadratic_wireframe_3d(Mesh* mesh, Mesh* wireframe_mesh,
   edge_vertices[0].reserve(wireframe_nedge*2);
   LO count_wireframe_vtx = 0;
 
-  for (LO i = 0; i < nedge; ++i) {
+  auto gid = HostRead<LO>(mesh->get_array<LO>(1, "class_id"));
+  auto gdim = HostRead<I8>(mesh->get_array<I8>(1, "class_dim"));
+
+    for (LO i = 0; i < nedge; ++i) {
     auto v0 = ev2v_h[i*2];
     auto v1 = ev2v_h[i*2 + 1];
-
     Real cx0 = vert_ctrlPts_h[v0*dim + 0];
     Real cy0 = vert_ctrlPts_h[v0*dim + 1];
     Real cz0 = vert_ctrlPts_h[v0*dim + 2];
-    Real cx1 = ctrlPts_h[i*dim + 0];
-    Real cy1 = ctrlPts_h[i*dim + 1];
-    Real cz1 = ctrlPts_h[i*dim + 2];
     Real cx2 = vert_ctrlPts_h[v1*dim + 0];
     Real cy2 = vert_ctrlPts_h[v1*dim + 1];
     Real cz2 = vert_ctrlPts_h[v1*dim + 2];
+
+    //testing for fgrid, rmv later
+    /*
+    Real r_min=1e16;
+    Real r = std::sqrt(cx0*cx0+cy0*cy0);
+    if (r < r_min) r_min = r;
+    r = std::sqrt(cx2*cx2+cy2*cy2);
+    if (r < r_min) r_min = r;
+    if ((r_min > 0.8) && (gdim[i] == 2) && (gid[i] !=3) && (gid[i] !=13))  {
+    */
+    //
+
+    Real cx1 = ctrlPts_h[i*dim + 0];
+    Real cy1 = ctrlPts_h[i*dim + 1];
+    Real cz1 = ctrlPts_h[i*dim + 2];
 
     for (LO i = 0; i < u_h.size(); ++i) {
       auto x_bezier = cx0*B0_quad(u_h[i]) + cx1*B1_quad(u_h[i]) +
@@ -431,6 +445,7 @@ void build_quadratic_wireframe_3d(Mesh* mesh, Mesh* wireframe_mesh,
 
       ++count_wireframe_vtx;
     }
+    //}
   }
 
   for (int i = 0; i < wireframe_nedge*2; ++i) {
@@ -837,6 +852,9 @@ void build_quadratic_curveVtk_3d(Mesh* mesh, Mesh* curveVtk_mesh,
   HostWrite<LO> host_fv2v(curveVtk_mesh_nface*3);
   std::vector<int> face_vertices[1];
   face_vertices[0].reserve(curveVtk_mesh_nface*3);
+  
+  auto gid = HostRead<LO>(mesh->get_array<LO>(2, "class_id"));
+  auto gdim = HostRead<I8>(mesh->get_array<I8>(2, "class_dim"));
 
   LO count_curveVtk_mesh_vtx = 0;
   for (LO face = 0; face < nface; ++face) {
@@ -851,22 +869,35 @@ void build_quadratic_curveVtk_3d(Mesh* mesh, Mesh* curveVtk_mesh,
     Real cy00 = coords_h[v0*dim + 1];
     Real cz00 = coords_h[v0*dim + 2];
 
-    Real cx10 = ctrlPts_h[e0*dim + 0];
-    Real cy10 = ctrlPts_h[e0*dim + 1];
-    Real cz10 = ctrlPts_h[e0*dim + 2];
-
     Real cx20 = coords_h[v1*dim + 0];
     Real cy20 = coords_h[v1*dim + 1];
     Real cz20 = coords_h[v1*dim + 2];
-
-    Real cx11 = ctrlPts_h[e1*dim + 0];
-    Real cy11 = ctrlPts_h[e1*dim + 1];
-    Real cz11 = ctrlPts_h[e1*dim + 2];
 
     Real cx02 = coords_h[v2*dim + 0];
     Real cy02 = coords_h[v2*dim + 1];
     Real cz02 = coords_h[v2*dim + 2];
 
+    //testing for fgrid, rmv later
+    /*
+    Real r_min=1e16;
+    Real r = std::sqrt(cx00*cx00+cy00*cy00);
+    if (r < r_min) r_min = r;
+    r = std::sqrt(cx20*cx20+cy20*cy20);
+    if (r < r_min) r_min = r;
+    r = std::sqrt(cx02*cx02+cy02*cy02);
+    if (r < r_min) r_min = r;
+    if ((r_min > 0.8) && (gdim[face] == 2) && (gid[face] !=3) && (gid[face] !=13))  {
+    */
+    //
+
+    Real cx10 = ctrlPts_h[e0*dim + 0];
+    Real cy10 = ctrlPts_h[e0*dim + 1];
+    Real cz10 = ctrlPts_h[e0*dim + 2];
+
+    Real cx11 = ctrlPts_h[e1*dim + 0];
+    Real cy11 = ctrlPts_h[e1*dim + 1];
+    Real cz11 = ctrlPts_h[e1*dim + 2];
+ 
     Real cx01 = ctrlPts_h[e2*dim + 0];
     Real cy01 = ctrlPts_h[e2*dim + 1];
     Real cz01 = ctrlPts_h[e2*dim + 2];
@@ -910,6 +941,7 @@ void build_quadratic_curveVtk_3d(Mesh* mesh, Mesh* curveVtk_mesh,
         ++count_curveVtk_mesh_vtx;
       }
     }
+    //}
   }
 
   for (int i = 0; i < curveVtk_mesh_nface*3; ++i) {
