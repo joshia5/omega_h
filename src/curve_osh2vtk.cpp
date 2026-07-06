@@ -14,7 +14,9 @@ void rf(Library *lib) {
   auto comm = lib->world();
 
   auto mesh = binary::read(
-      "/users/joshia5/lore.scorec.rpi.edu/Meshes/RF/assemble/v102rgn12_643k-fscreen5mm_p2.osh", comm);
+      "/users/joshia5/lore.scorec.rpi.edu/Meshes/RF/assemble/v102rgn12_226k-fscreen1cm_p2.osh"
+      //"/users/joshia5/lore.scorec.rpi.edu/Meshes/RF/assemble/v102rgn12_643k-fscreen5mm_p2.osh"
+      , comm);
   printf("mesh size v e f r {%d,%d,%d,%d}\n", mesh.nverts(), mesh.nedges(),
       mesh.nfaces(), mesh.nelems());
   Reals const coords = mesh.coords();
@@ -33,13 +35,18 @@ void rf(Library *lib) {
   auto wireframe_mesh = Mesh(comm->library());
   wireframe_mesh.set_comm(comm);
   build_quadratic_wireframe_3d(&mesh, &wireframe_mesh,10);
-  std::string vtuPath = "/users/joshia5/lore.scorec.rpi.edu/Meshes/RF/interp_noise/643kfscreen5mm_wire.vtu";
+  std::string vtuPath = 
+    "/users/joshia5/lore.scorec.rpi.edu/Meshes/RF/interp_noise/226kfscreen1cm_wire.vtu"
+    //"/users/joshia5/lore.scorec.rpi.edu/Meshes/RF/interp_noise/643kfscreen5mm_wire.vtu"
+    ;
   vtk::write_simplex_connectivity(vtuPath.c_str(), &wireframe_mesh, 1);
+  /*
   auto curveVtk_mesh = Mesh(comm->library());
   curveVtk_mesh.set_comm(comm);
   build_quadratic_curveVtk_3d(&mesh, &curveVtk_mesh,10);
   vtuPath = "/users/joshia5/lore.scorec.rpi.edu/Meshes/RF/interp_noise/643kfscreen5mm_crvVtk.vtu";
   vtk::write_simplex_connectivity(vtuPath.c_str(), &curveVtk_mesh, 2);
+  */
 
   return; 
 }

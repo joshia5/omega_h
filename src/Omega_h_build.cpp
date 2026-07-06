@@ -418,7 +418,7 @@ void build_quadratic_wireframe_3d(Mesh* mesh, Mesh* wireframe_mesh,
     if (r < r_min) r_min = r;
     r = std::sqrt(cx2*cx2+cy2*cy2);
     if (r < r_min) r_min = r;
-    if ((r_min > 0.8) && (gdim[i] == 2) && (gid[i] !=3) && (gid[i] !=13))  {
+    if ((r_min > 0.8) && (gdim[i] <= 2) && (gid[i] !=3) && (gid[i] !=13))  {
     */
     //
 
